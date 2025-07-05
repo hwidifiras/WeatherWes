@@ -1,0 +1,47 @@
+{
+  "results": {
+    "location_id": {
+      "status": 404,
+      "success": false,
+      "url": "https://api.openaq.org/v3/measurements?location_id=141&limit=5",
+      "error": {
+        "detail": "Not Found"
+      }
+    },
+    "location": {
+      "status": 404,
+      "success": false,
+      "url": "https://api.openaq.org/v3/measurements?location=141&limit=5",
+      "error": {
+        "detail": "Not Found"
+      }
+    },
+    "locations": {
+      "status": 404,
+      "success": false,
+      "url": "https://api.openaq.org/v3/measurements?locations=141&limit=5",
+      "error": {
+        "detail": "Not Found"
+      }
+    },
+    "id": {
+      "status": 404,
+      "success": false,
+      "url": "https://api.openaq.org/v3/measurements?id=141&limit=5",
+      "error": {
+        "detail": "Not Found"
+      }
+    },
+    "entity": {
+      "status": 404,
+      "success": false,
+      "url": "https://api.openaq.org/v3/measurements?entity=141&limit=5",
+      "error": {
+        "detail": "Not Found"
+      }
+    }
+  },
+  "recommended_param": null,
+  "timestamp": "2025-07-03T07:25:06.812215",
+  "test_id": "141"
+}

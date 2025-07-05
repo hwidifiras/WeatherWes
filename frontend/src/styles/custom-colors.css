@@ -1,0 +1,129 @@
+:root {
+  /* Primary colors - Hot Pink for testing */
+  --color-primary-50: #FFF5F7;
+  --color-primary-100: #FFEBEF;
+  --color-primary-200: #FECDD6;
+  --color-primary-300: #FEA3B4;
+  --color-primary-400: #FD6F8E;
+  --color-primary-500: #F63D68;
+  --color-primary-600: #E11D48;
+  --color-primary-700: #BE123C;
+  --color-primary-800: #9F1239;
+  --color-primary-900: #881337;
+  --color-primary-950: #4C0519;
+  
+  /* Secondary colors */
+  --color-secondary-50: #F0FDF4;
+  --color-secondary-100: #DCFCE7;
+  --color-secondary-200: #BBF7D0;
+  --color-secondary-300: #86EFAC;
+  --color-secondary-400: #4ADE80;
+  --color-secondary-500: #22C55E;
+  --color-secondary-600: #16A34A;
+  --color-secondary-700: #15803D;
+  --color-secondary-800: #166534;
+  --color-secondary-900: #14532D;
+  --color-secondary-950: #052E16;
+  
+  /* Gray colors */
+  --color-gray-50: #F8FAFC;
+  --color-gray-100: #F1F5F9;
+  --color-gray-200: #E2E8F0;
+  --color-gray-300: #CBD5E1;
+  --color-gray-400: #94A3B8;
+  --color-gray-500: #64748B;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1E293B;
+  --color-gray-900: #0F172A;
+  --color-gray-950: #020617;
+  
+  /* Error colors */
+  --color-error-50: #FEF2F2;
+  --color-error-100: #FEE2E2;
+  --color-error-300: #FCA5A5;
+  --color-error-500: #EF4444;
+  --color-error-600: #DC2626;
+  --color-error-700: #B91C1C;
+  
+  /* Warning colors */
+  --color-warning-50: #FFFBEB;
+  --color-warning-100: #FEF3C7;
+  --color-warning-300: #FCD34D;
+  --color-warning-500: #F59E0B;
+  --color-warning-600: #D97706;
+  --color-warning-700: #B45309;
+  
+  /* Success colors */
+  --color-success-50: #ECFDF5;
+  --color-success-100: #D1FAE5;
+  --color-success-300: #6EE7B7;
+  --color-success-500: #10B981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  
+  /* Info colors */
+  --color-info-50: #EFF6FF;
+  --color-info-100: #DBEAFE;
+  --color-info-300: #93C5FD;
+  --color-info-500: #3B82F6;
+  --color-info-600: #2563EB;
+  --color-info-700: #1D4ED8;
+  
+  /* AQI colors */
+  --color-aqi-good: #4ADE80;
+  --color-aqi-moderate: #FBBF24;
+  --color-aqi-unhealthy-sensitive: #FB923C;
+  --color-aqi-unhealthy: #EF4444;
+  --color-aqi-very-unhealthy: #A855F7;
+  --color-aqi-hazardous: #94171A;
+}
+
+/* Backward compatibility with existing code */
+.text-primary {
+  color: var(--color-primary-600);
+}
+
+.bg-primary {
+  background-color: var(--color-primary-600);
+}
+
+.text-primary-light {
+  color: var(--color-primary-400);
+}
+
+.bg-primary-light {
+  background-color: var(--color-primary-400);
+}
+
+.text-primary-dark {
+  color: var(--color-primary-800);
+}
+
+.bg-primary-dark {
+  background-color: var(--color-primary-800);
+}
+
+.text-secondary {
+  color: var(--color-secondary-600);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary-600);
+}
+
+.text-secondary-light {
+  color: var(--color-secondary-400);
+}
+
+.bg-secondary-light {
+  background-color: var(--color-secondary-400);
+}
+
+.text-secondary-dark {
+  color: var(--color-secondary-800);
+}
+
+.bg-secondary-dark {
+  background-color: var(--color-secondary-800);
+}
