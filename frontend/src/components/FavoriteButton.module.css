@@ -1,0 +1,64 @@
+/* FavoriteButton.module.css */
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-600-rgb), 0.5);
+}
+
+.icon {
+  transition: color var(--transition-duration-200);
+}
+
+.iconSm {
+  width: var(--spacing-4);
+  height: var(--spacing-4);
+}
+
+.iconMd {
+  width: var(--spacing-5);
+  height: var(--spacing-5);
+}
+
+.iconLg {
+  width: var(--spacing-6);
+  height: var(--spacing-6);
+}
+
+.iconActive {
+  color: var(--color-amber-500);
+}
+
+.iconInactive {
+  color: var(--color-gray-600);
+}
+
+.iconAnimating {
+  animation: bounce 0.7s ease-in-out;
+}
+
+.label {
+  margin-left: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+  60% {
+    transform: translateY(-3px);
+  }
+}

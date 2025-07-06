@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { LocationFilter } from '../utils/locationFilterService';
 import { countries, parameters } from '../utils/locationFilterService';
 import axios from 'axios';
+import styles from './LocationFilters.module.css';
 
 interface LocationFiltersProps {
   onFilterChange: (filters: LocationFilter) => void;
@@ -216,16 +217,16 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200">
-      <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-        <h2 className="text-lg font-medium text-gray-900">Filtrer les stations</h2>
-        <div className="flex items-center gap-2">
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Filtrer les stations</h2>
+        <div className={styles.headerActions}>
           <button 
             onClick={handleReset}
-            className="text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 py-1.5 px-3 rounded-md text-sm flex items-center transition-colors"
+            className={styles.resetButton}
             aria-label="Réinitialiser les filtres"
           >
-            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className={styles.resetIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
             Réinitialiser
@@ -233,14 +234,14 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
         </div>
       </div>
       
-      <div className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className={styles.form}>
+        <div className={styles.formGrid}>
           {/* Filtre par ville */}
-          <div className="relative">
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className={styles.inputGroup}>
+            <label htmlFor="city" className={styles.label}>
               Ville
             </label>
-            <div className="relative" ref={cityInputRef}>
+            <div className={styles.inputContainer} ref={cityInputRef}>
               <input
                 type="text"
                 id="city"
@@ -249,22 +250,22 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
                 onChange={handleInputChange}
                 onFocus={() => filters.city && filters.city.length >= 2 && setShowSuggestions(true)}
                 placeholder="Paris, Berlin, New York..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={styles.input}
               />
               {isLoadingSuggestions && (
-                <div className="absolute right-3 top-2">
-                  <div className="animate-spin w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full"></div>
+                <div className={styles.loadingSpinner}>
+                  <div className={styles.spinner}></div>
                 </div>
               )}
               
               {/* Liste de suggestions */}
               {showSuggestions && citySuggestions.length > 0 && (
-                <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <ul className={styles.suggestionsList}>
                   {citySuggestions.map((city, index) => (
                     <li
                       key={index}
                       onClick={() => handleSelectCity(city)}
-                      className="cursor-pointer text-gray-900 relative select-none py-2 px-4 hover:bg-gray-100"
+                      className={styles.suggestionItem}
                     >
                       {city}
                     </li>
@@ -276,7 +277,7 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
           
           {/* Filtre par pays */}
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="country" className={styles.label}>
               Pays
             </label>
             <select
@@ -284,7 +285,7 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
               name="country"
               value={filters.country || ''}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className={styles.select}
             >
               <option value="">Tous les pays</option>
               {countries.map(country => (
@@ -296,32 +297,32 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
           </div>
         </div>
         
-        <div className="mt-4 space-y-3">
+        <div className={styles.checkboxGroup}>
           {/* Options de filtre basiques */}
-          <div className="flex items-center">
+          <div className={styles.checkboxItem}>
             <input
               type="checkbox"
               id="excludeUnknown"
               name="excludeUnknown"
               checked={filters.excludeUnknown}
               onChange={handleInputChange}
-              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              className={styles.checkboxInput}
             />
-            <label htmlFor="excludeUnknown" className="ml-2 block text-sm text-gray-700">
+            <label htmlFor="excludeUnknown" className={styles.checkboxLabel}>
               Exclure les localisations inconnues
             </label>
           </div>
           
-          <div className="flex items-center">
+          <div className={styles.checkboxItem}>
             <input
               type="checkbox"
               id="hasRecent"
               name="hasRecent"
               checked={filters.hasRecent}
               onChange={handleInputChange}
-              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              className={styles.checkboxInput}
             />
-            <label htmlFor="hasRecent" className="ml-2 block text-sm text-gray-700">
+            <label htmlFor="hasRecent" className={styles.checkboxLabel}>
               Avec mesures récentes uniquement
             </label>
           </div>
@@ -331,9 +332,9 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
         <button
           type="button"
           onClick={toggleAdvancedFilters}
-          className="mt-4 flex items-center text-sm text-primary-700 hover:text-primary-900 focus:outline-none"
+          className={styles.collapsibleButton}
         >
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg className={styles.collapsibleIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={showAdvancedFilters ? "M19 9l-7 7-7-7" : "M9 5l7 7-7 7"}></path>
           </svg>
           {showAdvancedFilters ? 'Masquer les filtres avancés' : 'Afficher les filtres avancés'}
@@ -341,25 +342,25 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
         
         {/* Filtres avancés */}
         {showAdvancedFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
+          <div className={styles.advancedFilters}>
             {/* Filtre par polluants */}
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Polluants mesurés</h3>
-              <div className="space-y-3">
+            <div className={styles.filtersSection}>
+              <h3 className={styles.filtersTitle}>Polluants mesurés</h3>
+              <div className={styles.checkboxGroup}>
                 {Object.entries(groupedParameters).map(([group, groupParams]) => (
-                  <div key={group} className="ml-2">
-                    <h4 className="text-sm font-medium text-gray-600 mb-1">{getGroupLabel(group)}</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 ml-2">
+                  <div key={group} className={styles.filterGroup}>
+                    <h4 className={styles.filterGroupTitle}>{getGroupLabel(group)}</h4>
+                    <div className={styles.parameterGrid}>
                       {groupParams.map(param => (
-                        <div key={param.id} className="flex items-center">
+                        <div key={param.id} className={styles.parameterItem}>
                           <input
                             type="checkbox"
                             id={`param-${param.id}`}
                             checked={(filters.parameters || []).includes(param.id)}
                             onChange={(e) => handleParameterChange(param.id, e.target.checked)}
-                            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                            className={styles.parameterCheckbox}
                           />
-                          <label htmlFor={`param-${param.id}`} className="ml-2 block text-sm text-gray-700">
+                          <label htmlFor={`param-${param.id}`} className={styles.checkboxLabel}>
                             {param.name} {param.description ? `(${param.description})` : ''}
                           </label>
                         </div>
@@ -371,24 +372,24 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
             </div>
             
             {/* Filtre par coordonnées */}
-            <div className="space-y-2">
-              <div className="flex items-center">
+            <div className={styles.checkboxGroup}>
+              <div className={styles.checkboxItem}>
                 <input
                   type="checkbox"
                   id="useCoordinates"
                   checked={useCoordinates}
                   onChange={toggleCoordinates}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className={styles.checkboxInput}
                 />
-                <label htmlFor="useCoordinates" className="ml-2 block text-sm font-medium text-gray-700">
+                <label htmlFor="useCoordinates" className={styles.checkboxLabel}>
                   Filtrer par proximité géographique
                 </label>
               </div>
               
               {useCoordinates && filters.coordinates && (
-                <div className="pl-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                <div className={styles.coordinatesSection}>
                   <div>
-                    <label htmlFor="latitude" className="block text-xs font-medium text-gray-700">
+                    <label htmlFor="latitude" className={styles.label}>
                       Latitude
                     </label>
                     <input
@@ -402,13 +403,13 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
                           latitude: isNaN(value) ? 0 : value
                         });
                       }}
-                      className="mt-1 block w-full py-1 px-2 text-sm border border-gray-300 rounded-md"
+                      className={styles.input}
                       step="0.001"
                     />
                   </div>
                   
                   <div>
-                    <label htmlFor="longitude" className="block text-xs font-medium text-gray-700">
+                    <label htmlFor="longitude" className={styles.label}>
                       Longitude
                     </label>
                     <input
@@ -422,13 +423,13 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
                           longitude: isNaN(value) ? 0 : value
                         });
                       }}
-                      className="mt-1 block w-full py-1 px-2 text-sm border border-gray-300 rounded-md"
+                      className={styles.input}
                       step="0.001"
                     />
                   </div>
                   
                   <div>
-                    <label htmlFor="radius" className="block text-xs font-medium text-gray-700">
+                    <label htmlFor="radius" className={styles.label}>
                       Rayon (km)
                     </label>
                     <input
@@ -444,7 +445,7 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
                       }}
                       min="1"
                       max="500"
-                      className="mt-1 block w-full py-1 px-2 text-sm border border-gray-300 rounded-md"
+                      className={styles.input}
                     />
                   </div>
                 </div>
@@ -453,7 +454,7 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
             
             {/* Filtre par limite de résultats */}
             <div>
-              <label htmlFor="limit" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="limit" className={styles.label}>
                 Nombre maximum de résultats
               </label>
               <select
@@ -461,7 +462,7 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
                 name="limit"
                 value={filters.limit}
                 onChange={handleInputChange}
-                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                className={styles.select}
               >
                 <option value={10}>10 stations</option>
                 <option value={25}>25 stations</option>
@@ -475,14 +476,14 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
         )}
         
         {/* Bouton pour appliquer les filtres */}
-        <div className="mt-6 flex justify-end">
+        <div className={styles.actionButtons}>
           <button
             type="button"
             onClick={handleSubmit}
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+            className={`${styles.button} ${styles.primaryButton}`}
             disabled={!filtersChanged}
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className={styles.w5h5} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
             Charger

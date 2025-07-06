@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { isValidLocationId, normalizeLocationId, handleLocationError } from '../utils/locationUtils'
 import { addToFavorites, isFavorite, removeFromFavorites } from '../utils/favoritesService'
+import styles from './MeasurementList.module.css'
 
 // Interfaces types (inchangés)
 interface Coordinates {
@@ -208,38 +209,38 @@ function MeasurementList({ locationId }: MeasurementListProps) {
   
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-10 h-80">
-        <div className="inline-block w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-lg text-gray-600">Chargement des mesures...</p>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingSpinner}></div>
+        <p className={styles.loadingText}>Chargement des mesures...</p>
       </div>
     );
   }
   
   if (error) {
     return (
-      <div className="p-8 rounded-xl bg-error-50 border border-error-300 text-center mx-6 mb-6 shadow-sm">
-        <div className="text-4xl mb-4">⚠️</div>
-        <div className="text-xl font-medium mb-3 text-error-600">Erreur lors de la récupération des données</div>
-        <div className="mb-5 text-lg text-gray-700">{error}</div>
-        <div className="text-sm text-gray-500 mb-6">
+      <div className={styles.errorContainer}>
+        <div className={styles.errorIcon}>⚠️</div>
+        <div className={styles.errorTitle}>Erreur lors de la récupération des données</div>
+        <div className={styles.errorMessage}>{error}</div>
+        <div className={styles.errorDescription}>
           Veuillez réessayer avec une autre station ou contacter le support si le problème persiste.
         </div>
-        <div className="flex justify-center gap-5">
+        <div className={styles.errorActions}>
           <button 
             onClick={handleRefresh} 
             disabled={loading}
-            className="bg-primary-600 text-white hover:bg-primary-700 py-2.5 px-5 rounded-lg transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+            className={styles.errorButton}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className={styles.errorButtonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
             Réessayer
           </button>
           <button 
             onClick={handleDebugStation} 
-            className="bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 py-2.5 px-5 rounded-lg transition-colors flex items-center gap-2 shadow-sm"
+            className={styles.errorButtonSecondary}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className={styles.errorButtonIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z"></path>
             </svg>
             Diagnostiquer l'API
@@ -260,37 +261,37 @@ function MeasurementList({ locationId }: MeasurementListProps) {
   // Si aucune mesure n'est disponible, afficher un message convivial
   if (!hasMeasurements && !hasSummaries) {
     return (
-      <div className="p-4">
-        <div className="mb-4 pb-2 border-b border-gray-200">
-          <h3 className="text-lg font-medium mb-1 text-gray-900">{location.name}</h3>
-          <p className="text-sm text-gray-600">{location.city || location.locality || "Unknown Location"}, {location.country.name}</p>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h3 className={styles.locationTitle}>{location.name}</h3>
+          <p className={styles.locationSubtitle}>{location.city || location.locality || "Unknown Location"}, {location.country.name}</p>
         </div>
-        <div className="text-center p-6 bg-gray-50 rounded-lg">
-          <p className="mb-4 font-medium text-gray-800">Aucune donnée de mesure n'est disponible pour cette station.</p>
-          <p className="mb-1 text-sm text-gray-600">ID de la station: {location.id}</p>
-          <p className="mb-4 text-sm text-gray-600">Coordonnées: {location.coordinates.latitude.toFixed(4)}, {location.coordinates.longitude.toFixed(4)}</p>
+        <div className={styles.noDataContainer}>
+          <p className={styles.noDataTitle}>Aucune donnée de mesure n'est disponible pour cette station.</p>
+          <p className={styles.noDataInfo}>ID de la station: {location.id}</p>
+          <p className={styles.noDataInfo}>Coordonnées: {location.coordinates.latitude.toFixed(4)}, {location.coordinates.longitude.toFixed(4)}</p>
           
-          <div className="mt-6 p-4 bg-white border border-gray-200 rounded-md text-left shadow-sm">
-            <p className="mb-2 font-medium text-gray-800">Cette station pourrait être:</p>
-            <ul className="list-disc pl-6 mb-4 text-gray-700">
-              <li className="mb-1">Temporairement hors service</li>
-              <li className="mb-1">Ne pas avoir transmis de données récentes</li>
-              <li className="mb-1">Ne plus être référencée par OpenAQ</li>
+          <div className={styles.noDataDetails}>
+            <p className={styles.noDataDetailsTitle}>Cette station pourrait être:</p>
+            <ul className={styles.noDataList}>
+              <li className={styles.noDataListItem}>Temporairement hors service</li>
+              <li className={styles.noDataListItem}>Ne pas avoir transmis de données récentes</li>
+              <li className={styles.noDataListItem}>Ne plus être référencée par OpenAQ</li>
             </ul>
-            <p className="font-medium mt-4 text-gray-600">Essayez de sélectionner une autre station.</p>
+            <p className={styles.noDataAdvice}>Essayez de sélectionner une autre station.</p>
           </div>
           
-          <div className="flex justify-center gap-4 mt-6">
+          <div className={styles.noDataActions}>
             <button 
               onClick={handleRefresh} 
-              className="bg-primary-600 text-white hover:bg-primary-700 py-2 px-4 rounded-lg transition-colors shadow-sm disabled:opacity-50" 
+              className={styles.errorButton} 
               disabled={loading}
             >
               Forcer le rafraîchissement
             </button>
             <button 
               onClick={handleDebugStation} 
-              className="bg-gray-100 text-gray-800 hover:bg-gray-200 py-2 px-4 rounded-lg transition-colors shadow-sm border border-gray-200"
+              className={styles.errorButtonSecondary}
             >
               Diagnostiquer l'API
             </button>
@@ -338,13 +339,13 @@ function MeasurementList({ locationId }: MeasurementListProps) {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6 pb-4 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-        <div>
-          <h3 className="text-xl font-medium mb-2 text-gray-900">{location.name}</h3>
-          <div className="flex flex-wrap gap-3 items-center">
-            <p className="text-sm text-gray-600">{location.city || location.locality || "Unknown Location"}, {location.country.name}</p>
-            <span className="text-xs bg-primary-100 text-primary-700 px-3 py-1 rounded-full">
+    <div className={styles.container}>
+      <div className={styles.locationHeader}>
+        <div className={styles.locationInfo}>
+          <h3 className={styles.locationName}>{location.name}</h3>
+          <div className={styles.locationDetails}>
+            <p>{location.city || location.locality || "Unknown Location"}, {location.country.name}</p>
+            <span className={styles.dateBadge}>
               {new Date().toLocaleDateString()} 
             </span>
           </div>
@@ -352,15 +353,11 @@ function MeasurementList({ locationId }: MeasurementListProps) {
         
         <button 
           onClick={handleToggleFavorite}
-          className={`p-2.5 rounded-lg transition-colors flex items-center gap-2 ${
-            isFavorited 
-              ? 'text-amber-500 bg-amber-50 hover:bg-amber-100' 
-              : 'text-gray-500 hover:text-amber-500 hover:bg-amber-50'
-          }`}
+          className={`${styles.favoriteButton} ${isFavorited ? styles.favorited : styles.notFavorited}`}
           aria-label={isFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
           title={isFavorited ? "Retirer des favoris" : "Ajouter aux favoris"}
         >
-          <svg className="w-5 h-5" fill={isFavorited ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={styles.favoriteIcon} fill={isFavorited ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
             {isFavorited 
               ? <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4V6.1" strokeWidth="0"/> 
               : <path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z" />
@@ -371,30 +368,22 @@ function MeasurementList({ locationId }: MeasurementListProps) {
       </div>
 
       {isDemoData && (
-        <div className="p-3 mb-4 bg-warning-50 text-warning-700 text-sm border border-warning-200 rounded-md flex items-center gap-2">
-          <span className="text-xl">⚠️</span> 
+        <div className={styles.warningMessage}>
+          <span className={styles.warningIcon}>⚠️</span> 
           <span>Les données affichées proviennent d'une source de démonstration et peuvent ne pas être à jour.</span>
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="inline-flex gap-3 bg-gray-100 rounded-lg p-1">
+      <div className={styles.controls}>
+        <div className={styles.tabNavigation}>
           <button
-            className={`py-2.5 px-5 rounded-md transition-colors ${
-              !showSummary 
-                ? 'bg-primary-600 text-white shadow-sm' 
-                : 'bg-transparent text-gray-600 hover:bg-white'
-            }`}
+            className={`${styles.tabButton} ${!showSummary ? styles.active : styles.inactive}`}
             onClick={() => setShowSummary(false)}
           >
             Dernières mesures
           </button>
           <button
-            className={`py-2.5 px-5 rounded-md transition-colors ${
-              showSummary 
-                ? 'bg-primary-600 text-white shadow-sm' 
-                : 'bg-transparent text-gray-600 hover:bg-white'
-            }`}
+            className={`${styles.tabButton} ${showSummary ? styles.active : styles.inactive}`}
             onClick={() => setShowSummary(true)}
           >
             Résumé
@@ -402,18 +391,18 @@ function MeasurementList({ locationId }: MeasurementListProps) {
         </div>
         
         {/* Status indicator - utilise apiStatus pour éviter l'erreur "déclaré mais jamais lu" */}
-        <div className="ml-auto">
+        <div className={styles.statusIndicator}>
           <span 
-            className={`inline-flex items-center text-xs px-2.5 py-1 rounded-full ${
-              apiStatus === 'ok' ? 'bg-green-100 text-green-800' : 
-              apiStatus === 'no-data' ? 'bg-amber-100 text-amber-800' : 
-              'bg-red-100 text-red-800'
+            className={`${styles.statusBadge} ${
+              apiStatus === 'ok' ? styles.ok : 
+              apiStatus === 'no-data' ? styles.noData : 
+              styles.error
             }`}
           >
-            <span className={`w-2 h-2 mr-1 rounded-full ${
-              apiStatus === 'ok' ? 'bg-green-500' : 
-              apiStatus === 'no-data' ? 'bg-amber-500' : 
-              'bg-red-500'
+            <span className={`${styles.statusDot} ${
+              apiStatus === 'ok' ? styles.ok : 
+              apiStatus === 'no-data' ? styles.noData : 
+              styles.error
             }`}></span>
             {apiStatus === 'ok' ? 'Données disponibles' : 
              apiStatus === 'no-data' ? 'Aucune donnée' : 
@@ -423,61 +412,61 @@ function MeasurementList({ locationId }: MeasurementListProps) {
       </div>
 
       {showSummary ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className={styles.summaryGrid}>
           {measurements_summary?.map((summary) => (
-            <div key={summary.parameter} className="p-5 bg-white rounded-xl border border-gray-200 shadow hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-lg font-medium text-gray-900">{summary.parameter.toUpperCase()}</h4>
-                <div className="bg-primary-50 text-primary-700 text-xs rounded-full py-1 px-3">
+            <div key={summary.parameter} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h4 className={styles.cardTitle}>{summary.parameter.toUpperCase()}</h4>
+                <div className={styles.cardUnit}>
                   {summary.unit}
                 </div>
               </div>
-              <div className="space-y-3 mb-4">
-                <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
-                  <span className="text-gray-600">Moyenne:</span>
-                  <span className="font-medium text-gray-900">{summary.avg_value.toFixed(2)} {summary.unit}</span>
+              <div className={styles.summaryStats}>
+                <div className={styles.statRow}>
+                  <span className={styles.statLabel}>Moyenne:</span>
+                  <span className={styles.statValue}>{summary.avg_value.toFixed(2)} {summary.unit}</span>
                 </div>
-                <div className="flex justify-between items-center p-2">
-                  <span className="text-gray-600">Min:</span>
-                  <span className="font-medium text-gray-900">{summary.min_value.toFixed(2)} {summary.unit}</span>
+                <div className={styles.statRow}>
+                  <span className={styles.statLabel}>Min:</span>
+                  <span className={styles.statValue}>{summary.min_value.toFixed(2)} {summary.unit}</span>
                 </div>
-                <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
-                  <span className="text-gray-600">Max:</span>
-                  <span className="font-medium text-gray-900">{summary.max_value.toFixed(2)} {summary.unit}</span>
+                <div className={styles.statRow}>
+                  <span className={styles.statLabel}>Max:</span>
+                  <span className={styles.statValue}>{summary.max_value.toFixed(2)} {summary.unit}</span>
                 </div>
-                <div className="flex justify-between items-center p-2">
-                  <span className="text-gray-600">Mesures:</span>
-                  <span className="font-medium text-gray-900">{summary.count}</span>
+                <div className={styles.statRow}>
+                  <span className={styles.statLabel}>Mesures:</span>
+                  <span className={styles.statValue}>{summary.count}</span>
                 </div>
               </div>
-              <div className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-200">
+              <div className={styles.cardFooter}>
                 Dernière mise à jour: {new Date(summary.last_updated).toLocaleString()}
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div className={styles.measurementsGrid}>
           {measurements?.map((measurement, index) => (
-            <div key={index} className="p-5 bg-white rounded-xl border border-gray-200 shadow hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-lg font-medium text-gray-900">{measurement.parameter.toUpperCase()}</h4>
-                <div className="bg-primary-50 text-primary-700 text-xs rounded-full py-1 px-3">
+            <div key={index} className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h4 className={styles.cardTitle}>{measurement.parameter.toUpperCase()}</h4>
+                <div className={styles.cardUnit}>
                   {measurement.unit}
                 </div>
               </div>
-              <div className="text-3xl font-bold text-primary-600 mb-3">
+              <div className={styles.cardValue}>
                 {measurement.value.toFixed(2)}
               </div>
-              <div className="text-xs text-gray-500 mb-2">
+              <div className={styles.cardDate}>
                 {new Date(measurement.date).toLocaleString()}
               </div>
               {measurement.coordinates && (
-                <div className="text-xs bg-gray-50 rounded-lg py-1.5 px-3 mt-3 flex items-center gap-2">
-                  <svg className="w-3 h-3 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                <div className={styles.cardCoordinates}>
+                  <svg className={styles.coordinatesIcon} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                   </svg>
-                  <span className="text-gray-600">
+                  <span className={styles.coordinatesText}>
                     {measurement.coordinates.latitude.toFixed(4)}, {measurement.coordinates.longitude.toFixed(4)}
                   </span>
                 </div>
@@ -489,7 +478,7 @@ function MeasurementList({ locationId }: MeasurementListProps) {
 
       {/* Toast de confirmation */}
       {showToast && (
-        <div className="fixed bottom-4 right-4 bg-primary-600 text-white p-4 rounded-lg shadow-lg z-50">
+        <div className={styles.toast}>
           {toastMessage}
         </div>
       )}

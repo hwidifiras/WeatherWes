@@ -5,6 +5,7 @@ import {
   removeFromFavorites,
   sortFavorites 
 } from '../utils/favoritesService'
+import styles from './FavoritesList.module.css'
 
 interface FavoritesListProps {
   onSelectFavorite: (locationId: string, locationName: string) => void
@@ -81,50 +82,48 @@ function FavoritesList({ onSelectFavorite }: FavoritesListProps) {
   // Afficher un message si aucun favori
   if (favorites.length === 0) {
     return (
-      <div className="text-center p-6">
-        <p className="text-lg mb-4 text-gray-800">Vous n'avez pas encore de stations favorites</p>
-        <p className="text-gray-600 mb-6">
+      <div className={styles.emptyState}>
+        <svg className={styles.emptyIcon} fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+        </svg>
+        <p className={styles.emptyTitle}>Vous n'avez pas encore de stations favorites</p>
+        <p className={styles.emptyDescription}>
           Ajoutez des stations à vos favoris pour y accéder rapidement.
         </p>
-        <div className="flex justify-center">
-          <svg className="w-16 h-16 text-gray-400 opacity-50" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-          </svg>
-        </div>
       </div>
     )
   }
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex gap-2">
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <div className={styles.sortButtons}>
           <button 
             onClick={() => handleSortChange('name')}
-            className={`text-sm py-1.5 px-3 rounded-md transition-colors ${
+            className={`${styles.sortButton} ${
               sortBy === 'name' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                ? styles.sortButtonActive
+                : styles.sortButtonInactive
             }`}
           >
             Nom {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
           </button>
           <button 
             onClick={() => handleSortChange('city')}
-            className={`text-sm py-1.5 px-3 rounded-md transition-colors ${
+            className={`${styles.sortButton} ${
               sortBy === 'city' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                ? styles.sortButtonActive
+                : styles.sortButtonInactive
             }`}
           >
             Ville {sortBy === 'city' && (sortOrder === 'asc' ? '↑' : '↓')}
           </button>
           <button 
             onClick={() => handleSortChange('date')}
-            className={`text-sm py-1.5 px-3 rounded-md transition-colors ${
+            className={`${styles.sortButton} ${
               sortBy === 'date' 
-                ? 'bg-primary-600 text-white' 
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                ? styles.sortButtonActive
+                : styles.sortButtonInactive
             }`}
           >
             Date {sortBy === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}
@@ -132,48 +131,48 @@ function FavoritesList({ onSelectFavorite }: FavoritesListProps) {
         </div>
         <button 
           onClick={toggleEditMode}
-          className="text-sm py-1.5 px-3 bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md transition-colors"
+          className={styles.editButton}
           aria-label={isEditing ? "Terminer" : "Modifier"}
         >
           {isEditing ? "Terminer" : "Modifier"}
         </button>
       </div>
 
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <ul className={styles.favoritesGrid}>
         {favorites.map((favorite) => (
           <li
             key={favorite.id}
             onClick={() => !isEditing && onSelectFavorite(favorite.id, favorite.name)}
-            className={`p-4 rounded-md bg-white border shadow-sm cursor-pointer transition-all ${
+            className={`${styles.favoriteCard} ${
               isEditing 
-                ? 'border-dashed border-2 border-amber-500' 
-                : 'border-gray-200 hover:shadow-md hover:border-primary-300'
+                ? styles.favoriteCardEditing
+                : styles.favoriteCardNormal
             }`}
             tabIndex={0}
             role="button"
             aria-label={`Sélectionner la station ${favorite.name}`}
           >
-            <div className="flex justify-between items-start">
-              <h3 className="text-lg font-medium mb-1 text-gray-900">{favorite.name}</h3>
+            <div className={styles.favoriteCardHeader}>
+              <h3 className={styles.favoriteCardTitle}>{favorite.name}</h3>
               {isEditing && (
                 <button 
                   onClick={(e) => handleRemoveFavorite(e, favorite.id)}
-                  className="text-error-600 hover:bg-error-50 rounded-full p-1 transition-colors"
+                  className={styles.removeButton}
                   aria-label="Supprimer des favoris"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className={styles.removeIcon} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                   </svg>
                 </button>
               )}
             </div>
-            <p className="text-sm text-gray-600">
+            <p className={styles.favoriteLocation}>
               {favorite.city || "Localité inconnue"}, {favorite.country}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className={styles.favoriteCoordinates}>
               ({favorite.coordinates.latitude.toFixed(4)}, {favorite.coordinates.longitude.toFixed(4)})
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className={styles.favoriteDate}>
               Ajouté le {new Date(favorite.addedAt).toLocaleDateString()}
             </p>
           </li>

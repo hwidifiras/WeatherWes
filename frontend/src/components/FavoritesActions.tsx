@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { exportFavorites, importFavorites } from '../utils/favoritesService'
+import styles from './FavoritesActions.module.css'
 
 interface FavoritesActionsProps {
   onImportComplete: () => void
@@ -67,18 +68,18 @@ function FavoritesActions({ onImportComplete }: FavoritesActionsProps) {
   }
 
   return (
-    <div className="favorites-actions">
-      <div className="flex gap-2 mb-4">
+    <div className={styles.container}>
+      <div className={styles.buttonGroup}>
         <button
           onClick={handleExport}
-          className="btn btn-secondary"
+          className={styles.exportButton}
           title="Exporter vos favoris en fichier JSON"
         >
           Exporter les favoris
         </button>
         <button
           onClick={() => setShowImportModal(true)}
-          className="btn btn-secondary"
+          className={styles.importButton}
           title="Importer des favoris depuis un fichier JSON"
         >
           Importer des favoris
@@ -87,16 +88,16 @@ function FavoritesActions({ onImportComplete }: FavoritesActionsProps) {
 
       {/* Modal d'import */}
       {showImportModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-surface p-6 rounded-lg shadow-xl w-full max-w-md">
-            <h3 className="text-lg font-medium mb-4">Importer des favoris</h3>
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3 className={styles.modalTitle}>Importer des favoris</h3>
             
-            <div className="mb-4">
-              <label className="block mb-2">
+            <div className={styles.modalBody}>
+              <label className={styles.label}>
                 Collez le contenu JSON de vos favoris :
               </label>
               <textarea
-                className="w-full border border-border rounded-md p-2 min-h-32"
+                className={styles.textarea}
                 value={importData}
                 onChange={(e) => {
                   setImportData(e.target.value)
@@ -106,24 +107,24 @@ function FavoritesActions({ onImportComplete }: FavoritesActionsProps) {
               ></textarea>
               
               {importError && (
-                <p className="text-error text-sm mt-2">{importError}</p>
+                <p className={styles.errorMessage}>{importError}</p>
               )}
               
               {importSuccess && (
-                <p className="text-success text-sm mt-2">{importSuccess}</p>
+                <p className={styles.successMessage}>{importSuccess}</p>
               )}
             </div>
             
-            <div className="flex justify-end gap-2">
+            <div className={styles.modalFooter}>
               <button
                 onClick={() => setShowImportModal(false)}
-                className="btn btn-secondary"
+                className={styles.cancelButton}
               >
                 Annuler
               </button>
               <button
                 onClick={handleImport}
-                className="btn btn-primary"
+                className={styles.confirmButton}
                 disabled={!!importSuccess}
               >
                 Importer

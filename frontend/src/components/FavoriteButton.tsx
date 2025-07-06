@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { isFavorite, addToFavorites, removeFromFavorites } from '../utils/favoritesService';
+import styles from './FavoriteButton.module.css';
 
 interface FavoriteButtonProps {
   locationId: string;
@@ -49,7 +50,7 @@ const FavoriteButton = ({
         name: locationName,
         city: locationData.city || null,
         country: locationData.country || 'Unknown',
-        coordinates: locationData.coordinates,
+        coordinates: locationData.coordinates || { latitude: 0, longitude: 0 },
         addedAt: Date.now()
       };
       
@@ -69,25 +70,20 @@ const FavoriteButton = ({
     }
   };
 
-  // Size classes
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-5 h-5',
-    lg: 'w-6 h-6'
-  };
-  
-  // Animation classes
-  const animationClass = isAnimating ? 'animate-bounce' : '';
+  // Size and animation classes
+  const iconSizeClass = size === 'sm' ? styles.iconSm : size === 'lg' ? styles.iconLg : styles.iconMd;
+  const iconStateClass = isFav ? styles.iconActive : styles.iconInactive;
+  const animationClass = isAnimating ? styles.iconAnimating : '';
 
   return (
     <button 
-      className={`flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-opacity-50 ${className}`} 
+      className={`${styles.button} ${className}`} 
       onClick={handleToggleFavorite}
       aria-label={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
       title={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
     >
       <svg 
-        className={`${sizeClasses[size]} ${animationClass} transition-colors ${isFav ? 'text-amber-500' : 'text-gray-600'}`} 
+        className={`${styles.icon} ${iconSizeClass} ${iconStateClass} ${animationClass}`} 
         fill={isFav ? 'currentColor' : 'none'}
         stroke="currentColor" 
         viewBox="0 0 24 24" 
@@ -102,7 +98,7 @@ const FavoriteButton = ({
       </svg>
       
       {showLabel && (
-        <span className="ml-2 text-sm font-medium">
+        <span className={styles.label}>
           {isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
         </span>
       )}

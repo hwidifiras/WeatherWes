@@ -14,6 +14,10 @@
   --color-primary-900: #1E3A8A;
   --color-primary-950: #172554;
   
+  /* RGB values for rgba() functions */
+  --color-primary-600-rgb: 37, 99, 235;
+  --color-gray-100-rgb: 241, 245, 249;
+  
   /* Secondary colors - Teal (complementary to blue) */
   --color-secondary-50: #F0FDFA;
   --color-secondary-100: #CCFBF1;
@@ -28,6 +32,7 @@
   --color-secondary-950: #042F2E;
   
   /* Gray colors - Slate tones */
+  --color-gray-25: #FCFCFD;
   --color-gray-50: #F8FAFC;
   --color-gray-100: #F1F5F9;
   --color-gray-200: #E2E8F0;
@@ -100,6 +105,11 @@
   --color-aqi-very-unhealthy: #9333EA;
   --color-aqi-hazardous: #94171A;
   
+  /* Additional color utilities */
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  --color-amber-500: #F59E0B;
+  
   /* Background colors */
   --color-background: #FFFFFF;
   --color-background-alt: #F1F5F9;
@@ -110,6 +120,7 @@
   --color-surface: #FFFFFF;
   --color-surface-alt: #F8FAFC;
   --color-surface-elevated: #FFFFFF;
+  --color-surface-hover: #F1F5F9;
   
   /* Border colors */
   --color-border: #E2E8F0;
@@ -211,16 +222,35 @@
   --spacing-80: 20rem;      /* 320px */
   --spacing-96: 24rem;      /* 384px */
   
-  /* Border radius */
-  --border-radius-none: 0;
-  --border-radius-sm: 0.125rem;    /* 2px */
-  --border-radius: 0.25rem;        /* 4px */
-  --border-radius-md: 0.375rem;    /* 6px */
-  --border-radius-lg: 0.5rem;      /* 8px */
-  --border-radius-xl: 0.75rem;     /* 12px */
-  --border-radius-2xl: 1rem;       /* 16px */
-  --border-radius-3xl: 1.5rem;     /* 24px */
-  --border-radius-full: 9999px;
+  /* Icon sizing scale for consistency */
+  --icon-xs: 0.75rem;      /* 12px */
+  --icon-sm: 1rem;         /* 16px */
+  --icon-md: 1.25rem;      /* 20px */
+  --icon-lg: 1.5rem;       /* 24px */
+  --icon-xl: 2rem;         /* 32px */
+  --icon-2xl: 2.5rem;      /* 40px */
+  --icon-3xl: 3rem;        /* 48px */
+  
+  /* Enhanced layout spacing */
+  --layout-padding-sm: var(--spacing-4);   /* 16px */
+  --layout-padding-md: var(--spacing-6);   /* 24px */
+  --layout-padding-lg: var(--spacing-8);   /* 32px */
+  --layout-padding-xl: var(--spacing-12);  /* 48px */
+  
+  /* Component spacing standards */
+  --component-padding-xs: var(--spacing-2);  /* 8px */
+  --component-padding-sm: var(--spacing-3);  /* 12px */
+  --component-padding-md: var(--spacing-4);  /* 16px */
+  --component-padding-lg: var(--spacing-6);  /* 24px */
+  --component-padding-xl: var(--spacing-8);  /* 32px */
+  
+  /* Gap spacing for consistent layouts */
+  --gap-xs: var(--spacing-1);   /* 4px */
+  --gap-sm: var(--spacing-2);   /* 8px */
+  --gap-md: var(--spacing-3);   /* 12px */
+  --gap-lg: var(--spacing-4);   /* 16px */
+  --gap-xl: var(--spacing-6);   /* 24px */
+  --gap-2xl: var(--spacing-8);  /* 32px */
   
   /* Z-index */
   --z-index-0: 0;
@@ -245,7 +275,7 @@
   --transition-property-opacity: opacity;
   --transition-property-shadow: box-shadow;
   --transition-property-transform: transform;
-  
+
   --transition-duration-75: 75ms;
   --transition-duration-100: 100ms;
   --transition-duration-150: 150ms;
@@ -254,11 +284,22 @@
   --transition-duration-500: 500ms;
   --transition-duration-700: 700ms;
   --transition-duration-1000: 1000ms;
-  
+
   --transition-timing-ease-linear: linear;
   --transition-timing-ease-in: cubic-bezier(0.4, 0, 1, 1);
   --transition-timing-ease-out: cubic-bezier(0, 0, 0.2, 1);
   --transition-timing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Letter spacing */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+  
+  /* Container max width */
+  --container-max-width: 1200px;
 }
 
 /* Base styles */
