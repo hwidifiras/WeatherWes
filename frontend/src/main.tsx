@@ -1,13 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-// Import Tailwind CSS
+// Import CSS
 import './index.css'
 
-import App from './App.tsx'
+import SimpleChakraApp from './SimpleChakraApp.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <SimpleChakraApp />
   </StrictMode>,
 )

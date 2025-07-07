@@ -92,6 +92,23 @@ export const removeFromFavorites = (locationId: string): boolean => {
 };
 
 /**
+ * Supprime une station des favoris
+ * @param locationId ID de la station à supprimer
+ * @returns true si la suppression a réussi, false sinon
+ */
+export const removeFavorite = (locationId: string): boolean => {
+  try {
+    const favorites = getFavorites();
+    const updatedFavorites = favorites.filter(fav => fav.id !== locationId);
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(updatedFavorites));
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de la suppression du favori:', error);
+    return false;
+  }
+};
+
+/**
  * Vérifie si une station est dans les favoris
  * @param locationId ID de la station à vérifier
  * @returns true si la station est dans les favoris, false sinon

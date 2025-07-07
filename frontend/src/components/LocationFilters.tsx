@@ -1,8 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
+import {
+  Box,
+  VStack,
+  HStack,
+  Input,
+  Button,
+  Text,
+  Badge,
+  Flex,
+  useDisclosure,
+  Spinner
+} from '@chakra-ui/react';
 import type { LocationFilter } from '../utils/locationFilterService';
 import { countries, parameters } from '../utils/locationFilterService';
 import axios from 'axios';
-import styles from './LocationFilters.module.css';
 
 interface LocationFiltersProps {
   onFilterChange: (filters: LocationFilter) => void;
@@ -22,7 +33,7 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
   });
 
   // État pour l'interface utilisateur
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const { open: showAdvancedFilters, onToggle: toggleAdvancedFilters } = useDisclosure();
   const [useCoordinates, setUseCoordinates] = useState(false);
   const [filtersChanged, setFiltersChanged] = useState(false);
   
@@ -60,7 +71,7 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
         const response = await axios.get(`http://localhost:8000/api/cities/suggest?q=${encodeURIComponent(searchTerm)}`);
         
         if (response.data && Array.isArray(response.data)) {
-          setCitySuggestions(response.data.slice(0, 10)); // Limit to 10 suggestions
+          setCitySuggestions(response.data.slice(0, 10));
         }
       } catch (error) {
         console.error('Erreur lors de la récupération des suggestions:', error);
@@ -98,18 +109,6 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
     setFiltersChanged(true);
   };
 
-  // Gérer le changement de champ de saisie générique
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    
-    if (type === 'checkbox') {
-      const checked = (e.target as HTMLInputElement).checked;
-      handleFilterChange(name as keyof LocationFilter, checked as any);
-    } else {
-      handleFilterChange(name as keyof LocationFilter, value as any);
-    }
-  };
-
   // Gérer la sélection de paramètres (polluants)
   const handleParameterChange = (parameterId: string, checked: boolean) => {
     const newParameters = checked
@@ -123,11 +122,6 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
   const handleSelectCity = (city: string) => {
     handleFilterChange('city', city);
     setShowSuggestions(false);
-  };
-
-  // Toggle les filtres avancés
-  const toggleAdvancedFilters = () => {
-    setShowAdvancedFilters(prev => !prev);
   };
 
   // Toggle les filtres par coordonnées
@@ -162,9 +156,6 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
     });
   };
 
-  // Toggle le filtre par bbox (bounding box) - Fonctionnalité à implémenter ultérieurement
-  /* Removed unused function toggleBbox */
-
   // Soumettre les filtres
   const handleSubmit = () => {
     onFilterChange(filters);
@@ -184,14 +175,12 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
     
     setFilters(defaultFilters);
     setUseCoordinates(false);
-    setShowAdvancedFilters(false);
     onFilterChange(defaultFilters);
     setFiltersChanged(false);
   };
 
   // Grouper les paramètres par type
   const groupedParameters = parameters.reduce((acc, param) => {
-    // Déterminer le groupe en fonction de l'ID du paramètre
     let group = 'other';
     if (['pm25', 'pm10', 'bc'].includes(param.id)) {
       group = 'particulates';
@@ -199,298 +188,268 @@ const LocationFilters = ({ onFilterChange, initialFilters = {} }: LocationFilter
       group = 'gases';
     }
     
-    if (!acc[group]) {
-      acc[group] = [];
-    }
+    if (!acc[group]) acc[group] = [];
     acc[group].push(param);
     return acc;
   }, {} as Record<string, typeof parameters>);
 
-  // Conversion du groupe en nom lisible
-  const getGroupLabel = (group: string): string => {
-    switch (group) {
-      case 'gases': return 'Gaz';
-      case 'particulates': return 'Particules';
-      case 'other': return 'Autres';
-      default: return group.charAt(0).toUpperCase() + group.slice(1);
-    }
-  };
-
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Filtrer les stations</h2>
-        <div className={styles.headerActions}>
-          <button 
-            onClick={handleReset}
-            className={styles.resetButton}
-            aria-label="Réinitialiser les filtres"
-          >
-            <svg className={styles.resetIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            Réinitialiser
-          </button>
-        </div>
-      </div>
-      
-      <div className={styles.form}>
-        <div className={styles.formGrid}>
-          {/* Filtre par ville */}
-          <div className={styles.inputGroup}>
-            <label htmlFor="city" className={styles.label}>
-              Ville
-            </label>
-            <div className={styles.inputContainer} ref={cityInputRef}>
-              <input
-                type="text"
-                id="city"
-                name="city"
+    <Box p={6} bg="white" borderRadius="lg" boxShadow="sm" border="1px" borderColor="gray.200">
+      <VStack gap={4} align="stretch">
+        <Text fontSize="lg" fontWeight="bold" color="gray.700">
+          Filtres de recherche
+        </Text>
+
+        {/* Filtres de base */}
+        <HStack gap={4} align="end">
+          <Box position="relative" flex="1">
+            <Text fontSize="sm" fontWeight="medium" mb={2}>Ville</Text>
+            <Box position="relative">
+              <Input
+                ref={cityInputRef}
+                placeholder="Rechercher une ville..."
                 value={filters.city || ''}
-                onChange={handleInputChange}
-                onFocus={() => filters.city && filters.city.length >= 2 && setShowSuggestions(true)}
-                placeholder="Paris, Berlin, New York..."
-                className={styles.input}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleFilterChange('city', e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                pr={isLoadingSuggestions ? "40px" : "16px"}
               />
               {isLoadingSuggestions && (
-                <div className={styles.loadingSpinner}>
-                  <div className={styles.spinner}></div>
-                </div>
+                <Box
+                  position="absolute"
+                  right="12px"
+                  top="50%"
+                  transform="translateY(-50%)"
+                >
+                  <Spinner size="sm" />
+                </Box>
               )}
-              
-              {/* Liste de suggestions */}
-              {showSuggestions && citySuggestions.length > 0 && (
-                <ul className={styles.suggestionsList}>
-                  {citySuggestions.map((city, index) => (
-                    <li
-                      key={index}
-                      onClick={() => handleSelectCity(city)}
-                      className={styles.suggestionItem}
-                    >
-                      {city}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-          
-          {/* Filtre par pays */}
-          <div>
-            <label htmlFor="country" className={styles.label}>
-              Pays
-            </label>
+            </Box>
+            
+            {/* Suggestions de villes */}
+            {showSuggestions && citySuggestions.length > 0 && (
+              <Box
+                position="absolute"
+                top="100%"
+                left={0}
+                right={0}
+                bg="white"
+                border="1px"
+                borderColor="gray.200"
+                borderRadius="md"
+                boxShadow="lg"
+                zIndex={10}
+                maxH="200px"
+                overflowY="auto"
+              >
+                {citySuggestions.map((city, index) => (
+                  <Box
+                    key={index}
+                    p={2}
+                    cursor="pointer"
+                    _hover={{ bg: "gray.50" }}
+                    onClick={() => handleSelectCity(city)}
+                  >
+                    <Text fontSize="sm">{city}</Text>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+
+          <Box maxW="200px">
+            <Text fontSize="sm" fontWeight="medium" mb={2}>Pays</Text>
             <select
-              id="country"
-              name="country"
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                backgroundColor: 'white',
+                fontSize: '14px'
+              }}
               value={filters.country || ''}
-              onChange={handleInputChange}
-              className={styles.select}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleFilterChange('country', e.target.value)}
             >
               <option value="">Tous les pays</option>
-              {countries.map(country => (
+              {countries.map((country) => (
                 <option key={country.code} value={country.code}>
                   {country.name}
                 </option>
               ))}
             </select>
-          </div>
-        </div>
-        
-        <div className={styles.checkboxGroup}>
-          {/* Options de filtre basiques */}
-          <div className={styles.checkboxItem}>
-            <input
-              type="checkbox"
-              id="excludeUnknown"
-              name="excludeUnknown"
-              checked={filters.excludeUnknown}
-              onChange={handleInputChange}
-              className={styles.checkboxInput}
-            />
-            <label htmlFor="excludeUnknown" className={styles.checkboxLabel}>
-              Exclure les localisations inconnues
-            </label>
-          </div>
-          
-          <div className={styles.checkboxItem}>
-            <input
-              type="checkbox"
-              id="hasRecent"
-              name="hasRecent"
-              checked={filters.hasRecent}
-              onChange={handleInputChange}
-              className={styles.checkboxInput}
-            />
-            <label htmlFor="hasRecent" className={styles.checkboxLabel}>
-              Avec mesures récentes uniquement
-            </label>
-          </div>
-        </div>
-        
-        {/* Bouton pour afficher/masquer les filtres avancés */}
-        <button
-          type="button"
-          onClick={toggleAdvancedFilters}
-          className={styles.collapsibleButton}
-        >
-          <svg className={styles.collapsibleIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={showAdvancedFilters ? "M19 9l-7 7-7-7" : "M9 5l7 7-7 7"}></path>
-          </svg>
-          {showAdvancedFilters ? 'Masquer les filtres avancés' : 'Afficher les filtres avancés'}
-        </button>
-        
-        {/* Filtres avancés */}
-        {showAdvancedFilters && (
-          <div className={styles.advancedFilters}>
-            {/* Filtre par polluants */}
-            <div className={styles.filtersSection}>
-              <h3 className={styles.filtersTitle}>Polluants mesurés</h3>
-              <div className={styles.checkboxGroup}>
-                {Object.entries(groupedParameters).map(([group, groupParams]) => (
-                  <div key={group} className={styles.filterGroup}>
-                    <h4 className={styles.filterGroupTitle}>{getGroupLabel(group)}</h4>
-                    <div className={styles.parameterGrid}>
-                      {groupParams.map(param => (
-                        <div key={param.id} className={styles.parameterItem}>
-                          <input
-                            type="checkbox"
-                            id={`param-${param.id}`}
-                            checked={(filters.parameters || []).includes(param.id)}
-                            onChange={(e) => handleParameterChange(param.id, e.target.checked)}
-                            className={styles.parameterCheckbox}
-                          />
-                          <label htmlFor={`param-${param.id}`} className={styles.checkboxLabel}>
-                            {param.name} {param.description ? `(${param.description})` : ''}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Filtre par coordonnées */}
-            <div className={styles.checkboxGroup}>
-              <div className={styles.checkboxItem}>
-                <input
-                  type="checkbox"
-                  id="useCoordinates"
-                  checked={useCoordinates}
-                  onChange={toggleCoordinates}
-                  className={styles.checkboxInput}
-                />
-                <label htmlFor="useCoordinates" className={styles.checkboxLabel}>
-                  Filtrer par proximité géographique
-                </label>
-              </div>
-              
-              {useCoordinates && filters.coordinates && (
-                <div className={styles.coordinatesSection}>
-                  <div>
-                    <label htmlFor="latitude" className={styles.label}>
-                      Latitude
-                    </label>
-                    <input
-                      type="number"
-                      id="latitude"
-                      value={filters.coordinates.latitude}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        handleFilterChange('coordinates', {
-                          ...filters.coordinates!,
-                          latitude: isNaN(value) ? 0 : value
-                        });
-                      }}
-                      className={styles.input}
-                      step="0.001"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="longitude" className={styles.label}>
-                      Longitude
-                    </label>
-                    <input
-                      type="number"
-                      id="longitude"
-                      value={filters.coordinates.longitude}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        handleFilterChange('coordinates', {
-                          ...filters.coordinates!,
-                          longitude: isNaN(value) ? 0 : value
-                        });
-                      }}
-                      className={styles.input}
-                      step="0.001"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="radius" className={styles.label}>
-                      Rayon (km)
-                    </label>
-                    <input
-                      type="number"
-                      id="radius"
-                      value={filters.coordinates.radius}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        handleFilterChange('coordinates', {
-                          ...filters.coordinates!,
-                          radius: isNaN(value) ? 1 : Math.max(1, value)
-                        });
-                      }}
-                      min="1"
-                      max="500"
-                      className={styles.input}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Filtre par limite de résultats */}
-            <div>
-              <label htmlFor="limit" className={styles.label}>
-                Nombre maximum de résultats
-              </label>
-              <select
-                id="limit"
-                name="limit"
-                value={filters.limit}
-                onChange={handleInputChange}
-                className={styles.select}
-              >
-                <option value={10}>10 stations</option>
-                <option value={25}>25 stations</option>
-                <option value={50}>50 stations</option>
-                <option value={100}>100 stations</option>
-                <option value={250}>250 stations</option>
-                <option value={500}>500 stations</option>
-              </select>
-            </div>
-          </div>
-        )}
-        
-        {/* Bouton pour appliquer les filtres */}
-        <div className={styles.actionButtons}>
-          <button
-            type="button"
+          </Box>
+
+          <Button
+            colorScheme="blue"
             onClick={handleSubmit}
-            className={`${styles.button} ${styles.primaryButton}`}
             disabled={!filtersChanged}
           >
-            <svg className={styles.w5h5} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            Charger
-          </button>
-        </div>
-      </div>
-    </div>
+            Rechercher
+          </Button>
+        </HStack>
+
+        {/* Toggle des filtres avancés */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleAdvancedFilters}
+        >
+          <HStack gap={2}>
+            <Text>Filtres avancés</Text>
+            <Text>{showAdvancedFilters ? '↑' : '↓'}</Text>
+          </HStack>
+        </Button>
+
+        {/* Filtres avancés */}
+        {showAdvancedFilters && (
+          <VStack gap={4} align="stretch" p={4} bg="gray.50" borderRadius="md">
+            {/* Options de base */}
+            <HStack gap={4} justify="space-between">
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type="checkbox"
+                  checked={filters.hasRecent}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('hasRecent', e.target.checked)}
+                />
+                <Text fontSize="sm">Données récentes uniquement</Text>
+              </label>
+              
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type="checkbox"
+                  checked={filters.excludeUnknown}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('excludeUnknown', e.target.checked)}
+                />
+                <Text fontSize="sm">Exclure les villes inconnues</Text>
+              </label>
+            </HStack>
+
+            {/* Limite de résultats */}
+            <Box maxW="200px">
+              <Text fontSize="sm" fontWeight="medium" mb={2}>Nombre de résultats</Text>
+              <Input
+                type="number"
+                min={10}
+                max={200}
+                value={filters.limit || 50}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('limit', parseInt(e.target.value))}
+              />
+            </Box>
+
+            {/* Filtres par coordonnées */}
+            <VStack align="stretch" gap={2}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type="checkbox"
+                  checked={useCoordinates}
+                  onChange={toggleCoordinates}
+                />
+                <Text fontSize="sm">Recherche par position géographique</Text>
+              </label>
+              
+              {useCoordinates && filters.coordinates && (
+                <HStack gap={4}>
+                  <Box>
+                    <Text fontSize="xs" mb={1}>Latitude</Text>
+                    <Input
+                      type="number"
+                      step={0.0001}
+                      value={filters.coordinates.latitude}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                        handleFilterChange('coordinates', {
+                          ...filters.coordinates!,
+                          latitude: parseFloat(e.target.value)
+                        })
+                      }
+                    />
+                  </Box>
+                  
+                  <Box>
+                    <Text fontSize="xs" mb={1}>Longitude</Text>
+                    <Input
+                      type="number"
+                      step={0.0001}
+                      value={filters.coordinates.longitude}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                        handleFilterChange('coordinates', {
+                          ...filters.coordinates!,
+                          longitude: parseFloat(e.target.value)
+                        })
+                      }
+                    />
+                  </Box>
+                  
+                  <Box>
+                    <Text fontSize="xs" mb={1}>Rayon (km)</Text>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={filters.coordinates.radius}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                        handleFilterChange('coordinates', {
+                          ...filters.coordinates!,
+                          radius: parseInt(e.target.value)
+                        })
+                      }
+                    />
+                  </Box>
+                </HStack>
+              )}
+            </VStack>
+
+            {/* Sélection des polluants */}
+            <Box>
+              <Text fontSize="sm" fontWeight="medium" mb={2}>
+                Polluants mesurés ({(filters.parameters || []).length} sélectionnés)
+              </Text>
+              
+              {Object.entries(groupedParameters).map(([groupName, groupParams]) => (
+                <Box key={groupName} mb={3}>
+                  <Text fontSize="xs" fontWeight="bold" color="gray.600" mb={1} textTransform="uppercase">
+                    {groupName === 'particulates' ? 'Particules' : 
+                     groupName === 'gases' ? 'Gaz' : 'Autres'}
+                  </Text>
+                  <Flex wrap="wrap" gap={2}>
+                    {groupParams.map((param) => (
+                      <label key={param.id} style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                        <input
+                          type="checkbox"
+                          checked={(filters.parameters || []).includes(param.id)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleParameterChange(param.id, e.target.checked)}
+                        />
+                        <Badge variant="outline" fontSize="xs">
+                          {param.name} ({param.id})
+                        </Badge>
+                      </label>
+                    ))}
+                  </Flex>
+                </Box>
+              ))}
+            </Box>
+
+            {/* Actions */}
+            <HStack justify="space-between">
+              <Button size="sm" variant="ghost" onClick={handleReset}>
+                Réinitialiser
+              </Button>
+              
+              <Button
+                size="sm"
+                colorScheme="blue"
+                onClick={handleSubmit}
+                disabled={!filtersChanged}
+              >
+                Appliquer les filtres
+              </Button>
+            </HStack>
+          </VStack>
+        )}
+      </VStack>
+    </Box>
   );
 };
 

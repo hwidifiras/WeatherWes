@@ -1,11 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import {
+  Box,
+  Text,
+  Spinner,
+  Icon
+} from '@chakra-ui/react'
+import { FaMapMarkerAlt, FaClock, FaChartBar, FaExclamationTriangle } from 'react-icons/fa'
 import axios from 'axios'
-import { addToFavorites, isFavorite, removeFromFavorites } from '../utils/favoritesService'
+import { isFavorite } from '../utils/favoritesService'
 import type { LocationFilter } from '../utils/locationFilterService'
 import { buildQueryParams } from '../utils/locationFilterService'
 import LocationFilters from './LocationFilters'
 import FilterSummary from './FilterSummary'
-import styles from './LocationList.module.css'
+import FavoriteButton from './FavoriteButton'
 
 interface Coordinates {
   latitude: number
@@ -45,9 +52,6 @@ function LocationList({ onSelectLocation }: LocationListProps) {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [favoriteStatus, setFavoriteStatus] = useState<Record<string, boolean>>({})
-  const [showToast, setShowToast] = useState(false)
-  const [toastMessage, setToastMessage] = useState('')
   const [page, setPage] = useState(1)
   const [hasMoreResults, setHasMoreResults] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
@@ -105,8 +109,6 @@ function LocationList({ onSelectLocation }: LocationListProps) {
           const locationId = location.id.toString();
           favoriteStatuses[locationId] = isFavorite(locationId);
         });
-        
-        setFavoriteStatus(prev => ({ ...prev, ...favoriteStatuses }));
       } else {
         // Pas de données ou format incorrect
         setFilteredLocations([]);
@@ -171,46 +173,6 @@ function LocationList({ onSelectLocation }: LocationListProps) {
     fetchLocations(filters, nextPage);
   };
 
-  // Gérer les favoris
-  const handleToggleFavorite = (location: Location) => {
-    const locationId = location.id.toString();
-    const isCurrentlyFavorite = favoriteStatus[locationId] || false;
-    let success = false;
-    
-    if (isCurrentlyFavorite) {
-      success = removeFromFavorites(locationId);
-      if (success) {
-        setToastMessage(`${location.name} retiré des favoris`);
-      }
-    } else {
-      const favoriteLocation = {
-        id: locationId,
-        name: location.name,
-        city: location.city,
-        country: location.country.name,
-        coordinates: location.coordinates,
-        addedAt: Date.now()
-      };
-      
-      success = addToFavorites(favoriteLocation);
-      if (success) {
-        setToastMessage(`${location.name} ajouté aux favoris`);
-      }
-    }
-    
-    if (success) {
-      // Mettre à jour le statut local
-      setFavoriteStatus(prev => ({
-        ...prev,
-        [locationId]: !isCurrentlyFavorite
-      }));
-      
-      // Afficher le toast
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-    }
-  };
-
   // Formatter une date relative
   const formatRelativeDate = (dateString: string | null) => {
     if (!dateString) return 'Inconnue';
@@ -236,138 +198,139 @@ function LocationList({ onSelectLocation }: LocationListProps) {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.filtersSection}>
+    <Box p={4}>
+      <Box mb={6}>
         <LocationFilters onFilterChange={handleFilterChange} initialFilters={filters} />
-      </div>
+      </Box>
       
       {filteredLocations.length > 0 && (
-        <div className={styles.summarySection}>
-          <FilterSummary filters={filters} totalLocations={locations.length} />
-        </div>
+        <Box mb={4}>
+          <FilterSummary totalLocations={locations.length} />
+        </Box>
       )}
       
       {loading && isInitialLoad ? (
-        <div className={styles.loadingContainer}>
+        <Box>
           {[...Array(3)].map((_, i) => (
-            <div key={i} className={styles.skeletonCard}>
-              <div className={styles.skeletonCardContent}>
-                <div className={styles.skeletonTitle}></div>
-                <div className={styles.skeletonSubtitle}></div>
-                <div className={styles.skeletonFooter}>
-                  <div className={styles.skeletonFooterItem}></div>
-                  <div className={styles.skeletonFooterItem}></div>
-                </div>
-              </div>
-            </div>
+            <Box key={i} p={4} borderWidth={1} borderRadius="lg" bg="white" mb={4}>
+              <Box display="flex" flexDirection="column" gap={3}>
+                <Box h="20px" bg="gray.200" borderRadius="md" />
+                <Box h="16px" bg="gray.200" borderRadius="md" w="80%" />
+                <Box display="flex" gap={4}>
+                  <Box h="16px" bg="gray.200" borderRadius="md" w="80px" />
+                  <Box h="16px" bg="gray.200" borderRadius="md" w="120px" />
+                </Box>
+              </Box>
+            </Box>
           ))}
-        </div>
+        </Box>
       ) : error ? (
-        <div className={styles.errorContainer}>
-          <div className={styles.errorHeader}>
-            <svg className={styles.errorIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <h3 className={styles.errorTitle}>Erreur de chargement</h3>
-          </div>
-          <p>{error}</p>
-        </div>
+        <Box p={4} bg="red.50" border="1px solid" borderColor="red.200" borderRadius="lg">
+          <Box display="flex" alignItems="center" gap={2}>
+            <Icon as={FaExclamationTriangle} color="red.500" />
+            <Box>
+              <Text fontWeight="bold" color="red.700">Erreur de chargement</Text>
+              <Text color="red.600">{error}</Text>
+            </Box>
+          </Box>
+        </Box>
       ) : filteredLocations.length === 0 ? (
-        <div className={styles.noResultsContainer}>
-          <svg className={styles.noResultsIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-          </svg>
-          <h3 className={styles.noResultsTitle}>Aucune station trouvée</h3>
-          <p className={styles.noResultsText}>Essayez de modifier vos critères de filtrage pour trouver des stations.</p>
-        </div>
+        <Box textAlign="center" py={10}>
+          <Icon as={FaMapMarkerAlt} w={16} h={16} color="gray.300" mb={4} />
+          <Text fontSize="lg" fontWeight="semibold" color="gray.600" mb={2}>
+            Aucune station trouvée
+          </Text>
+          <Text color="gray.500">
+            Essayez de modifier vos critères de filtrage pour trouver des stations.
+          </Text>
+        </Box>
       ) : (
-        <div className={styles.grid}>
+        <Box>
           {filteredLocations.map((location) => (
-            <div
+            <Box
               key={location.id}
-              className={styles.locationCard}
+              p={4}
+              borderWidth={1}
+              borderRadius="lg"
+              bg="white"
+              shadow="sm"
+              mb={4}
+              _hover={{
+                shadow: 'md',
+                transform: 'translateY(-2px)',
+                transition: 'all 0.2s'
+              }}
+              cursor="pointer"
+              onClick={() => onSelectLocation(location.id.toString(), location.name)}
             >
-              <div 
-                className={styles.locationCardContent}
-                onClick={() => onSelectLocation(location.id.toString(), location.name)}
-              >
-                <div className={styles.locationCardHeader}>
-                  <h3 className={styles.locationCardTitle}>{location.name}</h3>
-                  <button 
-                    className={styles.favoriteButton}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleFavorite(location);
-                    }}
-                    aria-label={favoriteStatus[location.id.toString()] ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-                  >
-                    <svg className={styles.favoriteIcon} fill={favoriteStatus[location.id.toString()] ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                    </svg>
-                  </button>
-                </div>
-                
-                <div className={styles.locationInfo}>
-                  <div className={styles.locationDetail}>
-                    <svg className={styles.locationIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    {location.city ? (
-                      <>
-                        <span>{location.city}, {location.country.name}</span>
-                      </>
-                    ) : location.country ? (
-                      <span>{location.country.name}</span>
-                    ) : (
-                      <span className={styles.unknownLocation}>Localisation inconnue</span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className={styles.locationCardFooter}>
-                  <div className={styles.locationMeta}>
-                    <svg className={styles.metaIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    <span title={location.lastUpdated || 'Date inconnue'}>
-                      {location.lastUpdated ? formatRelativeDate(location.lastUpdated) : 'Jamais mis à jour'}
-                    </span>
-                  </div>
+              <Box display="flex" justifyContent="space-between" alignItems="start" gap={4}>
+                <Box flex={1}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Text fontSize="lg" fontWeight="semibold" color="gray.800">
+                      {location.name}
+                    </Text>
+                    <FavoriteButton
+                      locationId={location.id.toString()}
+                      locationName={location.name}
+                      locationData={{
+                        city: location.city,
+                        country: location.country.name,
+                        coordinates: location.coordinates
+                      }}
+                      onStatusChange={() => {
+                        // Favorite status change handled internally by FavoriteButton
+                      }}
+                    />
+                  </Box>
                   
-                  <div className={styles.locationMeta}>
-                    <svg className={styles.metaIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    <span>{location.parameters?.length || 0} polluants mesurés</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  <Box display="flex" alignItems="center" gap={2} color="gray.600" mb={2}>
+                    <Icon as={FaMapMarkerAlt} w={4} h={4} />
+                    {location.city ? (
+                      <Text fontSize="sm">
+                        {location.city}, {location.country.name}
+                      </Text>
+                    ) : (
+                      <Text fontSize="sm" color="gray.400">
+                        {location.country.name || 'Localisation inconnue'}
+                      </Text>
+                    )}
+                  </Box>
+                  
+                  <Box display="flex" gap={4} fontSize="sm" color="gray.500">
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Icon as={FaClock} w={3} h={3} />
+                      <Text title={location.lastUpdated || 'Date inconnue'}>
+                        {location.lastUpdated ? formatRelativeDate(location.lastUpdated) : 'Jamais mis à jour'}
+                      </Text>
+                    </Box>
+                    
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Icon as={FaChartBar} w={3} h={3} />
+                      <Text>{location.parameters?.length || 0} polluants mesurés</Text>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
           ))}
-        </div>
+        </Box>
       )}
 
       {/* Indicateur de chargement pour pagination */}
       {!isInitialLoad && loading && (
-        <div className={styles.loadingIndicator}>
-          <div className={styles.spinner}></div>
-          <span className={styles.loadingText}>Chargement...</span>
-        </div>
+        <Box display="flex" justifyContent="center" alignItems="center" py={4}>
+          <Spinner size="md" color="blue.500" mr={3} />
+          <Text color="gray.600">Chargement...</Text>
+        </Box>
       )}
 
       {/* Élément pour observer l'intersection (load more) */}
       {hasMoreResults && !loading && filteredLocations.length > 0 && (
-        <div ref={loadMoreRef} className={styles.loadMoreIndicator}>
-          <div className={styles.loadMoreSpinner}></div>
-        </div>
+        <Box ref={loadMoreRef} py={4}>
+          <Box h="20px" />
+        </Box>
       )}
-      
-      {/* Toast notification */}
-      <div className={`${styles.toast} ${showToast ? styles.visible : styles.hidden}`}>
-        {toastMessage}
-      </div>
-    </div>
+    </Box>
   );
 }
 
