@@ -2,6 +2,7 @@ import { Box, VStack, Text, Grid, ChakraProvider, createSystem, defaultConfig } 
 import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from 'react-router-dom';
 import ChakraLayout from './components/ChakraLayout';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ToastProvider } from './chakra-components/toast/ToastProvider';
 
 // Create the system for Chakra UI v3
 const system = createSystem(defaultConfig);
@@ -24,7 +25,7 @@ import { IoLocation, IoHeart, IoStatsChart, IoThermometer } from 'react-icons/io
 function Dashboard() {
   const navigate = useNavigate();
   
-  const handleSelectLocation = (locationId: string, locationName: string) => {
+  const handleSelectLocation = (locationId: number, locationName: string) => {
     console.log('Selected location:', locationId, locationName);
     navigate(`/measurements/${locationId}`);
   };
@@ -166,7 +167,7 @@ function MeasurementsPage() {
 function LocationsPage() {
   const navigate = useNavigate();
   
-  const handleSelectLocation = (locationId: string, locationName: string) => {
+  const handleSelectLocation = (locationId: number, locationName: string) => {
     console.log('Selected location:', locationId, locationName);
     navigate(`/measurements/${locationId}`);
   };
@@ -210,17 +211,19 @@ function SimpleChakraApp() {
   return (
     <ErrorBoundary>
       <ChakraProvider value={system}>
-        <Router>
-          <ChakraLayout>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/locations" element={<LocationsPage />} />
-              <Route path="/favorites" element={<FavoritesPage />} />
-              <Route path="/measurements/:locationId?" element={<MeasurementsPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Routes>
-          </ChakraLayout>
-        </Router>
+        <ToastProvider>
+          <Router>
+            <ChakraLayout>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/locations" element={<LocationsPage />} />
+                <Route path="/favorites" element={<FavoritesPage />} />
+                <Route path="/measurements/:locationId?" element={<MeasurementsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+              </Routes>
+            </ChakraLayout>
+          </Router>
+        </ToastProvider>
       </ChakraProvider>
     </ErrorBoundary>
   );

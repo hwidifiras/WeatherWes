@@ -202,7 +202,11 @@ const MeasurementList = ({ locationId }: MeasurementListProps) => {
       {locationData.summary && locationData.summary.length > 0 && (
         <Box mb={6}>
           <Text fontSize="lg" fontWeight="semibold" mb={4}>Résumé des mesures</Text>
-          <Grid templateColumns="repeat(auto-fit, minmax(200px, 1fr))" gap={4}>
+          <Grid templateColumns={{ 
+            base: "1fr",                    // Mobile: 1 card per row
+            md: "repeat(2, 1fr)",           // Tablet: 2 cards per row
+            lg: "repeat(3, 1fr)"            // Desktop: 3 cards per row
+          }} gap={4}>
             {locationData.summary.map((summary, index) => (
               <GridItem key={index}>
                 <Box p={4} bg="white" borderRadius="lg" shadow="sm" borderWidth={1}>

@@ -15,35 +15,18 @@ interface NavbarProps {
 export default function Navbar({
   brandText = "WeatherWeS",
   secondary = false,
-  mini = false,
+  mini = true,
   hovered = false,
 }: NavbarProps) {
-  // Calculate navbar width based on sidebar state
+  // Calculate navbar width based on sidebar state (always mini, toggle on hover)
   const getNavbarWidth = () => {
-    if (!mini) {
-      return {
-        base: 'calc(100vw - 6%)',
-        md: 'calc(100vw - 8%)',
-        lg: 'calc(100vw - 6%)',
-        xl: 'calc(100vw - 350px)',
-        '2xl': 'calc(100vw - 365px)',
-      };
-    }
     if (mini && hovered) {
       return {
-        base: 'calc(100vw - 6%)',
-        md: 'calc(100vw - 8%)',
-        lg: 'calc(100vw - 6%)',
-        xl: 'calc(100vw - 350px)',
-        '2xl': 'calc(100vw - 365px)',
+        base: 'calc(100vw - 285px)', // Full width sidebar when hovered
       };
     }
     return {
-      base: 'calc(100vw - 6%)',
-      md: 'calc(100vw - 8%)',
-      lg: 'calc(100vw - 6%)',
-      xl: 'calc(100vw - 170px)',
-      '2xl': 'calc(100vw - 185px)',
+      base: 'calc(100vw - 120px)', // Mini sidebar width
     };
   };
 

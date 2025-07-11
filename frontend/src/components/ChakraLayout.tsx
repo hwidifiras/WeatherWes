@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { Outlet } from 'react-router-dom';
-import Sidebar, { SidebarResponsive } from './Sidebar';
+import Sidebar from './Sidebar'; // Remove SidebarResponsive import
 import Navbar from './Navbar';
 import type { IconType } from 'react-icons';
 
@@ -55,12 +55,12 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const [mini] = useState(false);
+  const [mini] = useState(true); // Always in mini mode
   const [hovered, setHovered] = useState(false);
 
   return (
     <Box>
-      {/* Desktop Sidebar */}
+      {/* Main Sidebar - always visible in mini mode */}
       <Sidebar
         routes={routes}
         mini={mini}
@@ -77,23 +77,16 @@ export default function Layout({ children }: LayoutProps) {
         position="relative"
         maxHeight="100%"
         w={{
-          base: '100%',
-          xl: mini && !hovered ? 'calc(100% - 120px)' : 'calc(100% - 285px)',
+          base: mini && !hovered ? 'calc(100% - 120px)' : 'calc(100% - 285px)',
         }}
         maxWidth={{
-          base: '100%',
-          xl: mini && !hovered ? 'calc(100% - 120px)' : 'calc(100% - 285px)',
+          base: mini && !hovered ? 'calc(100% - 120px)' : 'calc(100% - 285px)',
         }}
         transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
         transitionDuration=".2s, .2s, .35s"
         transitionProperty="top, bottom, width"
         transitionTimingFunction="linear, linear, ease"
       >
-        {/* Mobile Sidebar Toggle */}
-        <Box display={{ base: 'block', xl: 'none' }} position="fixed" top="4" left="4" zIndex="banner">
-          <SidebarResponsive routes={routes} />
-        </Box>
-
         {/* Navbar */}
         <Navbar
           mini={mini}

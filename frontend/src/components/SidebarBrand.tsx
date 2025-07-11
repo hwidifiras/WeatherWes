@@ -5,7 +5,7 @@ interface SidebarBrandProps {
   hovered?: boolean;
 }
 
-export function SidebarBrand({ mini = false, hovered = false }: SidebarBrandProps) {
+export function SidebarBrand({ mini = true, hovered = false }: SidebarBrandProps) {
   const showFullLogo = !mini || (mini && hovered);
 
   return (
@@ -16,6 +16,8 @@ export function SidebarBrand({ mini = false, hovered = false }: SidebarBrandProp
         color="blue.600"
         my="32px"
         textAlign="center"
+        transition="all 0.2s"
+        opacity={showFullLogo ? 1 : 0.9}
       >
         {showFullLogo ? 'WeatherWeS' : 'WW'}
       </Text>
