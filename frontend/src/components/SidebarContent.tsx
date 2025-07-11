@@ -29,11 +29,9 @@ function SidebarContent({ routes, mini = false, hovered = false }: SidebarConten
     <Flex direction="column" height="100%" pt="25px" borderRadius="30px">
       <SidebarBrand mini={mini} hovered={hovered} />
       
-      <VStack gap="8px" mb="auto" mt="8px">
+      <VStack gap="8px" mb="auto" mt="8px" align="stretch">
         <Box
-          ps={!mini || (mini && hovered) ? '20px' : '16px'}
-          pe={{ md: '16px', '2xl': '1px' }}
-          ms={mini && !hovered ? '-16px' : 'unset'}
+          px={showUserSection ? '20px' : '16px'}
           w="100%"
         >
           <SidebarLinks mini={mini} hovered={hovered} routes={routes} />
@@ -46,8 +44,10 @@ function SidebarContent({ routes, mini = false, hovered = false }: SidebarConten
         mb="32px" 
         justifyContent="center" 
         alignItems="center"
-        px="20px"
+        px={showUserSection ? '20px' : '16px'}
         direction={showUserSection ? 'row' : 'column'}
+        opacity={showUserSection ? 1 : 0.7}
+        transition="all 0.2s"
       >
         <Box
           h="48px"

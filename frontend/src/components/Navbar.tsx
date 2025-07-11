@@ -18,17 +18,18 @@ export default function Navbar({
   mini = true,
   hovered = false,
 }: NavbarProps) {
-  // Calculate navbar width based on sidebar state (always mini, toggle on hover)
-  const getNavbarWidth = () => {
-    if (mini && hovered) {
-      return {
-        base: 'calc(100vw - 285px)', // Full width sidebar when hovered
-      };
-    }
+  // Calculate navbar left margin and width based on sidebar state
+  const getNavbarStyles = () => {
+    const sidebarWidth = (mini && !hovered) ? 120 : 285;
+    const margin = 16; // Base margin from sidebar
+    
     return {
-      base: 'calc(100vw - 120px)', // Mini sidebar width
+      left: `${sidebarWidth + margin + 12}px`, // Sidebar width + margin + additional padding
+      width: `calc(100vw - ${sidebarWidth + margin + 24}px)`, // Full width minus sidebar and margins
     };
   };
+
+  const navbarStyles = getNavbarStyles();
 
   return (
     <Box
@@ -46,27 +47,27 @@ export default function Navbar({
       borderStyle="solid"
       transitionDelay="0s, 0s, 0s, 0s"
       transitionDuration=" 0.25s, 0.25s, 0.25s, 0s"
-      transition-property="box-shadow, background-color, filter, border"
+      transition-property="box-shadow, background-color, filter, border, left, width"
       transitionTimingFunction="linear, linear, linear, linear"
       alignItems={{ xl: 'center' }}
       display={secondary ? 'block' : 'flex'}
       minH="75px"
       justifyContent={{ xl: 'center' }}
       lineHeight="25.6px"
-      mx="auto"
+      mx="0" // Remove auto margin
       mt="0px"
       pb="8px"
-      right={{ base: '12px', md: '30px', lg: '30px', xl: '30px' }}
+      left={navbarStyles.left} // Use left instead of right
       px={{
         base: '15px',
-        md: '10px',
+        md: '20px',
       }}
       ps={{
         xl: '12px',
       }}
       pt="8px"
       top={{ base: '12px', md: '16px', xl: '18px' }}
-      w={getNavbarWidth()}
+      w={navbarStyles.width}
     >
       <Flex
         w="100%"

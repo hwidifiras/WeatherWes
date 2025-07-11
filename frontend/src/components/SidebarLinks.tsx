@@ -40,7 +40,7 @@ export function SidebarLinks({ routes, mini = false, hovered = false }: SidebarL
             bg={isActive ? 'blue.500' : 'transparent'}
             color={isActive ? 'white' : 'gray.600'}
             borderRadius="lg"
-            p="10px"
+            p={showLabels ? "10px" : "12px"}
             mb="4px"
             _hover={{
               bg: isActive ? 'blue.600' : 'gray.100',
@@ -48,8 +48,13 @@ export function SidebarLinks({ routes, mini = false, hovered = false }: SidebarL
             }}
             transition="all 0.2s"
             cursor="pointer"
+            position="relative"
           >
-            <Flex align="center">
+            <Flex 
+              align="center" 
+              justify={showLabels ? "flex-start" : "center"}
+              w="100%"
+            >
               {route.icon && (
                 <Icon
                   as={route.icon}
@@ -60,7 +65,7 @@ export function SidebarLinks({ routes, mini = false, hovered = false }: SidebarL
                 />
               )}
               {showLabels && (
-                <Text fontSize="sm" fontWeight="normal">
+                <Text fontSize="sm" fontWeight="normal" whiteSpace="nowrap">
                   {route.name}
                 </Text>
               )}
@@ -72,7 +77,7 @@ export function SidebarLinks({ routes, mini = false, hovered = false }: SidebarL
   };
 
   return (
-    <VStack align="stretch" gap="4px">
+    <VStack align="stretch" gap="4px" w="100%">
       {createLinks(routes)}
     </VStack>
   );

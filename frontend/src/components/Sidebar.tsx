@@ -23,7 +23,7 @@ function Sidebar(props: SidebarProps) {
   const { routes, mini = true, hovered = false, setHovered } = props;
   
   // Transition and styling
-  const variantChange = '0.2s linear';
+  const variantChange = '0.25s linear';
   const shadow = '14px 17px 40px 4px rgba(112, 144, 176, 0.08)';
   const sidebarBg = 'white';
   const sidebarRadius = '30px';
@@ -31,25 +31,33 @@ function Sidebar(props: SidebarProps) {
 
   // Calculate sidebar width based on mini and hover state
   const getSidebarWidth = () => {
-    if (mini && hovered) return '285px';
-    return '120px';
+    if (mini) {
+      return hovered ? '285px' : '120px';
+    }
+    return '285px';
   };
 
   const handleMouseEnter = () => {
-    if (setHovered) setHovered(true);
+    if (mini && setHovered) {
+      setHovered(true);
+    }
   };
 
   const handleMouseLeave = () => {
-    if (setHovered) setHovered(false);
+    if (mini && setHovered) {
+      setHovered(false);
+    }
   };
 
   return (
     <Box
       position="fixed"
-      minH="100%"
+      minH="100vh"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      zIndex={100}
+      zIndex={1001} // Higher than navbar
+      top={0}
+      left={0}
     >
       <Box
         bg={sidebarBg}
@@ -60,8 +68,9 @@ function Sidebar(props: SidebarProps) {
         h="calc(100vh - 32px)"
         m={sidebarMargins}
         borderRadius={sidebarRadius}
-        minH="100%"
+        minH="calc(100vh - 32px)"
         overflowX="hidden"
+        overflowY="auto"
         boxShadow={shadow}
       >
         <SimpleScrollbars>
